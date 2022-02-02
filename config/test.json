@@ -1,0 +1,8 @@
+{
+    "dbConfig": {
+        "database": "hoaxifytest"
+    },
+    "apiServer": {
+        "port": 3002
+    }
+}
