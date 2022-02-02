@@ -4,7 +4,7 @@
   "description": "Test Driven Development using Express Js",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app",
+    "start": "nodemon index",
     "test": "jest --watch",
     "lint": "eslint ."
   },
@@ -17,7 +17,10 @@
   "author": "Umair Ali",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.2"
+    "bcryptjs": "^2.4.3",
+    "express": "^4.17.2",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.15.0"
   },
   "devDependencies": {
     "eslint": "^8.8.0",
@@ -30,7 +33,7 @@
   },
   "eslintConfig": {
     "parserOptions": {
-      "ecmaVersion": 6
+      "ecmaVersion": 2018
     },
     "extends": [
       "eslint:recommended",
