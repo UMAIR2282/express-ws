@@ -83,7 +83,7 @@ describe('User Registration', () => {
 
   it('returns username error message when username is null', async () => {
     const response = await postUser({ ...validUser, username: null });
-    expect(response.body.validationErrors.username).toBeDefined();
+    expect(response.body.validationErrors.username).toBe('Username cannot be null');
   });
 
   it('returns 400 Bad Request when email is null', async () => {
@@ -93,7 +93,7 @@ describe('User Registration', () => {
 
   it('returns email error message when email is null', async () => {
     const response = await postUser({ ...validUser, email: null });
-    expect(response.body.validationErrors.email).toBeDefined();
+    expect(response.body.validationErrors.email).toBe('Email cannot be null');
   });
 
   it('returns 400 Bad Request when password is null', async () => {
@@ -103,7 +103,7 @@ describe('User Registration', () => {
 
   it('returns password error message when password is null', async () => {
     const response = await postUser({ ...validUser, password: null });
-    expect(response.body.validationErrors.password).toBeDefined();
+    expect(response.body.validationErrors.password).toBe('Password cannot be null');
   });
 
   it('returns error for all when username, email, and password is null', async () => {
