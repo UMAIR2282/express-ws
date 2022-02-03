@@ -13,7 +13,7 @@ beforeEach(() => {
 });
 
 const validUser = {
-  username: 'user1',
+  username: 'username1',
   email: 'user1@test.com',
   password: 'P@ssw0rd',
 };
@@ -98,5 +98,14 @@ describe('User Registration', () => {
   it('returns error for all when username, email, and password is null', async () => {
     const response = await postUser({ username: null, email: null, password: null });
     expect(Object.keys(response.body.validationErrors)).toEqual(['username', 'email', 'password']);
+  });
+
+  it('returns size validation error when username is less than 6 characters', async () => {
+    const field = 'username';
+    const expectedMessage = 'Username cannot be less than 6 and more than 32 characters';
+    const user = { ...validUser };
+    user[field] = 'user1';
+    const response = await postUser(user);
+    expect(response.body.validationErrors[field]).toBe(expectedMessage);
   });
 });

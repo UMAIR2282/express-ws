@@ -3,33 +3,14 @@ const router = express.Router();
 const RegisterUser = require('../../../domains/users/actions/Register');
 const { check, validationResult } = require('express-validator');
 
-/*const validateUserName = (req, res, next) => {
-  const body = req.body;
-  if (body.username === undefined || body.username === null) {
-    req.validationErrors = { ...req.validationErrors, username: 'Username cannot be null' };
-  }
-  next();
-};
-
-const validateEmail = (req, res, next) => {
-  const body = req.body;
-  if (body.email === undefined || body.email === null) {
-    req.validationErrors = { ...req.validationErrors, email: 'Email cannot be null' };
-  }
-  next();
-};
-
-const validatePassword = (req, res, next) => {
-  const body = req.body;
-  if (body.password === undefined || body.password === null) {
-    req.validationErrors = { ...req.validationErrors, password: 'Password cannot be null' };
-  }
-  next();
-};*/
-
 router.post(
   '/api/1.0/users',
-  check('username').notEmpty().withMessage('Username cannot be null'),
+  check('username')
+    .notEmpty()
+    .withMessage('Username cannot be null')
+    .bail()
+    .isLength({ min: 6, max: 32 })
+    .withMessage('Username cannot be less than 6 and more than 32 characters'),
   check('email').notEmpty().withMessage('Email cannot be null'),
   check('password').notEmpty().withMessage('Password cannot be null'),
   async (req, res) => {
