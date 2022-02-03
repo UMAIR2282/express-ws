@@ -66,6 +66,11 @@ describe('User Registration', () => {
     expect(res).toBe(true);
   });
 
+  it('Not returns validationErrors field in response body when validation error does not occur', async () => {
+    const response = await postUser();
+    expect(response.body.validationErrors).not.toBeDefined();
+  });
+
   it('returns 400 Bad Request when username is null', async () => {
     const response = await postUser({ ...validUser, username: null });
     expect(response.status).toBe(400);
@@ -79,5 +84,30 @@ describe('User Registration', () => {
   it('returns username error message when username is null', async () => {
     const response = await postUser({ ...validUser, username: null });
     expect(response.body.validationErrors.username).toBeDefined();
+  });
+
+  it('returns 400 Bad Request when email is null', async () => {
+    const response = await postUser({ ...validUser, email: null });
+    expect(response.status).toBe(400);
+  });
+
+  it('returns email error message when email is null', async () => {
+    const response = await postUser({ ...validUser, email: null });
+    expect(response.body.validationErrors.email).toBeDefined();
+  });
+
+  it('returns 400 Bad Request when password is null', async () => {
+    const response = await postUser({ ...validUser, password: null });
+    expect(response.status).toBe(400);
+  });
+
+  it('returns password error message when password is null', async () => {
+    const response = await postUser({ ...validUser, password: null });
+    expect(response.body.validationErrors.password).toBeDefined();
+  });
+
+  it('returns error for all when username, email, and password is null', async () => {
+    const response = await postUser({ username: null, email: null, password: null });
+    expect(Object.keys(response.body.validationErrors)).toEqual(['username', 'email', 'password']);
   });
 });
