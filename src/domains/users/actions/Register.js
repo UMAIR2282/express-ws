@@ -14,7 +14,13 @@ const __invoke = async (body) => {
     const savedUser = await User.create(user);
     return { status: 201, message: 'User Created', success: true, response: savedUser };
   } catch (error) {
-    return { status: 400, message: 'User could not be Created', error: error, success: false };
+    return {
+      status: 400,
+      message: 'User could not be Created.',
+      validationErrors: { email: 'Email is in use' },
+      error: error,
+      success: false,
+    };
   }
 };
 

@@ -112,4 +112,10 @@ describe('User Registration', () => {
     const response = await postUser({ username: null, email: null, password: null });
     expect(Object.keys(response.body.validationErrors)).toEqual(['username', 'email', 'password']);
   });
+
+  it('returns Email is in use when same email is already in use', async () => {
+    await postUser();
+    const response = await postUser();
+    expect(response.body.validationErrors.email).toBe('Email is in use');
+  });
 });
