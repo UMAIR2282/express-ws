@@ -11,8 +11,16 @@ router.post(
     .bail()
     .isLength({ min: 6, max: 32 })
     .withMessage('Username cannot be less than 6 and more than 32 characters'),
-  check('email').notEmpty().withMessage('Email cannot be null'),
-  check('password').notEmpty().withMessage('Password cannot be null'),
+  check('email').notEmpty().withMessage('Email cannot be null').bail().isEmail().withMessage('Email is not Valid'),
+  check('password')
+    .notEmpty()
+    .withMessage('Password cannot be null')
+    .bail()
+    .isLength({ min: 8, max: 128 })
+    .withMessage('Password cannot be less than 8 and more than 128 characters')
+    .bail()
+    .isStrongPassword()
+    .withMessage('Password must have at least 1 uppercase, 1 lowercase, and 1 number'),
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

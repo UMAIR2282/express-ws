@@ -84,13 +84,26 @@ describe('User Registration', () => {
   });
 
   it.each`
-    field         | expectedMessage
-    ${'username'} | ${'Username cannot be null'}
-    ${'email'}    | ${'Email cannot be null'}
-    ${'password'} | ${'Password cannot be null'}
-  `('returns $expectedMessage error when $field is null', async ({ field, expectedMessage }) => {
+    field         | value              | expectedMessage
+    ${'username'} | ${null}            | ${'Username cannot be null'}
+    ${'username'} | ${'user1'}         | ${'Username cannot be less than 6 and more than 32 characters'}
+    ${'username'} | ${'a'.repeat(33)}  | ${'Username cannot be less than 6 and more than 32 characters'}
+    ${'email'}    | ${null}            | ${'Email cannot be null'}
+    ${'email'}    | ${'mail.com'}      | ${'Email is not Valid'}
+    ${'email'}    | ${'user.mail.com'} | ${'Email is not Valid'}
+    ${'email'}    | ${'user@mail'}     | ${'Email is not Valid'}
+    ${'password'} | ${null}            | ${'Password cannot be null'}
+    ${'password'} | ${'P4ssw'}         | ${'Password cannot be less than 8 and more than 128 characters'}
+    ${'password'} | ${'alllowercase'}  | ${'Password must have at least 1 uppercase, 1 lowercase, and 1 number'}
+    ${'password'} | ${'ALLUPPERCASE'}  | ${'Password must have at least 1 uppercase, 1 lowercase, and 1 number'}
+    ${'password'} | ${'NoNumber'}      | ${'Password must have at least 1 uppercase, 1 lowercase, and 1 number'}
+    ${'password'} | ${'l0wernumber'}   | ${'Password must have at least 1 uppercase, 1 lowercase, and 1 number'}
+    ${'password'} | ${'UPPER4UMBER'}   | ${'Password must have at least 1 uppercase, 1 lowercase, and 1 number'}
+    ${'password'} | ${'12345678'}      | ${'Password must have at least 1 uppercase, 1 lowercase, and 1 number'}
+    ${'password'} | ${'P'.repeat(129)} | ${'Password cannot be less than 8 and more than 128 characters'}
+  `('returns $expectedMessage error when $field is $value', async ({ field, value, expectedMessage }) => {
     const user = { ...validUser };
-    user[field] = null;
+    user[field] = value;
     const response = await postUser(user);
     expect(response.body.validationErrors[field]).toBe(expectedMessage);
   });
@@ -98,14 +111,5 @@ describe('User Registration', () => {
   it('returns error for all when username, email, and password is null', async () => {
     const response = await postUser({ username: null, email: null, password: null });
     expect(Object.keys(response.body.validationErrors)).toEqual(['username', 'email', 'password']);
-  });
-
-  it('returns size validation error when username is less than 6 characters', async () => {
-    const field = 'username';
-    const expectedMessage = 'Username cannot be less than 6 and more than 32 characters';
-    const user = { ...validUser };
-    user[field] = 'user1';
-    const response = await postUser(user);
-    expect(response.body.validationErrors[field]).toBe(expectedMessage);
   });
 });
