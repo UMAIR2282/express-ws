@@ -30,7 +30,7 @@ describe('User Registration', () => {
 
   it('returns success message when signup request is valid', async () => {
     const response = await postUser();
-    expect(response.body.message).toBe('User Created');
+    expect(response.body.message).toBeDefined();
   });
 
   it('saves the user to database', async () => {
@@ -71,8 +71,13 @@ describe('User Registration', () => {
     expect(response.status).toBe(400);
   });
 
-  it('returns validationErrors in request body when validation errors occur', async () => {
+  it('returns validationErrors field in response body when validation errors occur', async () => {
     const response = await postUser({ ...validUser, username: null });
     expect(response.body.validationErrors).not.toBeUndefined();
+  });
+
+  it('returns username error message when username is null', async () => {
+    const response = await postUser({ ...validUser, username: null });
+    expect(response.body.validationErrors.username).toBeDefined();
   });
 });
