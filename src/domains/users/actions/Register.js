@@ -12,12 +12,12 @@ const __invoke = async (body) => {
             password: hash,
             };*/
     const savedUser = await User.create(user);
-    return { status: 201, message: 'User Created', success: true, response: savedUser };
+    return { status: 201, message: 'user_created', success: true, response: savedUser };
   } catch (error) {
     return {
       status: 400,
-      message: 'User could not be Created.',
-      validationErrors: { email: 'Email is in use' },
+      message: 'user_notcreated',
+      validationErrors: { email: 'email_inuse' },
       error: error,
       success: false,
     };
