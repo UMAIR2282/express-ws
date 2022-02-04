@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const RegisterUser = require('../../../domains/users/actions/Register');
+const FetchUser = require('../../../domains/users/actions/Fetch');
 const { check, validationResult } = require('express-validator');
 
 router.post(
@@ -11,7 +12,19 @@ router.post(
     .bail()
     .isLength({ min: 6, max: 32 })
     .withMessage('Username cannot be less than 6 and more than 32 characters'),
-  check('email').notEmpty().withMessage('Email cannot be null').bail().isEmail().withMessage('Email is not Valid'),
+  check('email')
+    .notEmpty()
+    .withMessage('Email cannot be null')
+    .bail()
+    .isEmail()
+    .withMessage('Email is not Valid')
+    .bail()
+    .custom(async (email) => {
+      const user = await FetchUser.findByEmail(email);
+      if (user) {
+        throw new Error('Email is in use');
+      }
+    }),
   check('password')
     .notEmpty()
     .withMessage('Password cannot be null')
