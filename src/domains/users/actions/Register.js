@@ -1,10 +1,16 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+
+const generateToken = (length = 16) => {
+  return crypto.randomBytes(length).toString('hex');
+}
 
 const __invoke = async (body) => {
   try {
-    const hash = await bcrypt.hash(body.password, 10);
-    const user = { ...body, password: hash };
+    const { username, email, password } = body;
+    const hash = await bcrypt.hash(password, 10);
+    const user = { username, email, password: hash, activationToken: generateToken() };
     /*const user = Object.assign({}, body, { password: hash });
             const user = {
             username: body.username,

@@ -5,7 +5,7 @@ const sequelize = require('../../../src/config/database');
 const bcrypt = require('bcryptjs');
 
 beforeAll(() => {
-  return sequelize.sync();
+  return sequelize.sync({ force: true });
 });
 
 beforeEach(() => {
@@ -139,6 +139,31 @@ describe('User Registration', () => {
     user['username'] = null;
     const response = await postUser(user);
     expect(Object.keys(response.body.validationErrors)).toEqual(['username', 'email']);
+  });
+
+  it('creates user in inactive mode', async () => {
+    await postUser();
+    //query user table
+    const userList = await User.findAll();
+    const savedUser = userList[0];
+    expect(savedUser.inactive).toBe(true);
+  });
+
+  it('creates user in inactive mode even when body contains inactive as false', async () => {
+    const user = { ...validUser, inactive: false };
+    await postUser(user);
+    //query user table
+    const userList = await User.findAll();
+    const savedUser = userList[0];
+    expect(savedUser.inactive).toBe(true);
+  });
+
+  it('creates an activationToken for user', async () => {
+    await postUser();
+    //query user table
+    const userList = await User.findAll();
+    const savedUser = userList[0];
+    expect(savedUser.activationToken).toBeTruthy();
   });
 });
 
