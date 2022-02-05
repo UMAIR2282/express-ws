@@ -1,10 +1,11 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const ActivationEmail = require('../../emails/actions/ActivationEmail');
 
 const generateToken = (length = 16) => {
   return crypto.randomBytes(length).toString('hex');
-}
+};
 
 const __invoke = async (body) => {
   try {
@@ -18,7 +19,13 @@ const __invoke = async (body) => {
             password: hash,
             };*/
     const savedUser = await User.create(user);
-    return { status: 201, message: 'user_created', success: true, response: savedUser };
+    const emailSentStatus = await ActivationEmail.__invoke(email, user.activationToken);
+    return {
+      status: 201,
+      message: 'user_created',
+      success: true,
+      response: { user: savedUser, emailSentStatus: emailSentStatus },
+    };
   } catch (error) {
     return {
       status: 400,

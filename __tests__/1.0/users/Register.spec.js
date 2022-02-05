@@ -3,6 +3,7 @@ const app = require('../../../src/app');
 const User = require('../../../src/domains/users/models/User');
 const sequelize = require('../../../src/config/database');
 const bcrypt = require('bcryptjs');
+const nodemailerStub = require('nodemailer-stub');
 
 beforeAll(() => {
   return sequelize.sync({ force: true });
@@ -164,6 +165,16 @@ describe('User Registration', () => {
     const userList = await User.findAll();
     const savedUser = userList[0];
     expect(savedUser.activationToken).toBeTruthy();
+  });
+
+  it('sends an Account activation email with activationToken', async () => {
+    await postUser();
+    //query user table
+    const userList = await User.findAll();
+    const savedUser = userList[0];
+    const lastMail = nodemailerStub.interactsWithMail.lastMail();
+    expect(lastMail.to[0]).toBe(validUser.email);
+    expect(lastMail.content).toContain(savedUser.activationToken);
   });
 });
 
