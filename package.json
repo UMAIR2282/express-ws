@@ -35,7 +35,6 @@
     "eslint-plugin-prettier": "^4.0.0",
     "jest": "^27.4.7",
     "jest-watch-typeahead": "^1.0.0",
-    "nodemailer-stub": "^1.2.2",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.1",
     "smtp-server": "^3.9.0",
