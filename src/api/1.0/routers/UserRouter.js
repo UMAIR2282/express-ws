@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const RegisterUser = require('../../../domains/users/actions/Register');
+const ActivateUser = require('../../../domains/users/actions/Activate');
 const FetchUser = require('../../../domains/users/actions/Fetch');
 const { check, validationResult } = require('express-validator');
 
@@ -58,5 +59,14 @@ router.post(
     });
   }
 );
+
+router.post('/api/1.0/users/token/:token', async (req, res) => {
+  const response = await ActivateUser.__invoke(req.params.token);
+  return res.status(response.status).send({
+    message: req.t(response.message),
+    error: response.error,
+    success: response.success,
+  });
+});
 
 module.exports = router;

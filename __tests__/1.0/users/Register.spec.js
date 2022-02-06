@@ -54,6 +54,14 @@ const postUser = (user = validUser, options = { language: 'en' }) => {
   return agent.send(user);
 };
 
+const postUserToken = (token, options = { language: 'en' }) => {
+  const agent = request(app).post('/api/1.0/users/token/' + token);
+  if (options.language) {
+    agent.set('Accept-Language', options.language);
+  }
+  return agent.send();
+};
+
 describe('User Registration', () => {
   const user_created = 'User Created';
   const username_null = 'Username cannot be null';
@@ -281,4 +289,67 @@ describe('Internationalization', (options = { language: 'ur' }) => {
     const response = await postUser(validUser, options);
     expect(response.body.message).toBe(email_failure);
   });
+});
+
+describe('Account Activation', () => {
+  const activation_error_ur = 'This account is either already active or the token is invalid';
+  const activation_error_en = 'This account is either already active or the token is invalid';
+  const activation_success_ur = 'User has been Activated';
+  const activation_success_en = 'User has been Activated';
+
+  it('activates the account when correct token is sent', async () => {
+    await postUser();
+    //query user table
+    let userList = await User.findAll();
+    const token = userList[0].activationToken;
+    await postUserToken(token);
+    userList = await User.findAll();
+    expect(userList[0].inactive).toBe(false);
+  });
+
+  it('Removes the token from user table after successful activation', async () => {
+    await postUser();
+    //query user table
+    let userList = await User.findAll();
+    const token = userList[0].activationToken;
+    await postUserToken(token);
+    userList = await User.findAll();
+    expect(userList[0].activationToken).toBeFalsy();
+  });
+
+  it('does not activate the account when wrong token is sent', async () => {
+    await postUser();
+    const token = 'this-token-does-not-exist-in-database';
+    await postUserToken(token);
+    const userList = await User.findAll();
+    expect(userList[0].inactive).toBe(true);
+  });
+
+  it('returns bad request when token is wrong', async () => {
+    await postUser();
+    const token = 'this-token-does-not-exist-in-database';
+    const response = await postUserToken(token);
+    expect(response.status).toBe(400);
+  });
+
+  it.each`
+    language | tokenStatus  | expectedMessage
+    ${'ur'}  | ${'wrong'}   | ${activation_error_ur}
+    ${'en'}  | ${'wrong'}   | ${activation_error_en}
+    ${'ur'}  | ${'correct'} | ${activation_success_ur}
+    ${'en'}  | ${'correct'} | ${activation_success_en}
+  `(
+    'returns message $expectedMessage when token is wrong when language is set as $language',
+    async ({ language, tokenStatus, expectedMessage }) => {
+      await postUser(validUser, { language: language });
+      let token = 'this-token-does-not-exist-in-database';
+      if (tokenStatus === 'correct') {
+        //query user table
+        let userList = await User.findAll();
+        token = userList[0].activationToken;
+      }
+      const response = await postUserToken(token);
+      expect(response.body.message).toBe(expectedMessage);
+    }
+  );
 });

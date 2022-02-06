@@ -10,5 +10,8 @@
   "user_created": "صارف بن گیا ہے",
   "user_notcreated": "صارف نہیں بنایا جا سکا",
   "email_failure": "Email Failure",
-  "email_failure_message": "Failed to Deliver Email"
+  "email_failure_message": "Failed to Deliver Email",
+  "activation_token_invalid": "This account is either already active or the token is invalid",
+  "user_activated": "User has been Activated",
+  "user_notactivated": "User could not be Activated"
   }

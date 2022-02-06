@@ -11,5 +11,8 @@
   "user_notcreated": "User could not be Created",
   "user_datainvalid": "User could not be Created because the User data is Invalid",
   "email_failure": "Email Failure",
-  "email_failure_message": "Failed to Deliver Email"
+  "email_failure_message": "Failed to Deliver Email",
+  "activation_token_invalid": "This account is either already active or the token is invalid",
+  "user_activated": "User has been Activated",
+  "user_notactivated": "User could not be Activated"
 }
