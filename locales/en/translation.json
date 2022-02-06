@@ -9,5 +9,7 @@
   "password_pattern": "Password must have at least 1 uppercase, 1 lowercase, and 1 number",
   "user_created": "User Created",
   "user_notcreated": "User could not be Created",
-  "user_datainvalid": "User could not be Created because the User data is Invalid"
+  "user_datainvalid": "User could not be Created because the User data is Invalid",
+  "email_failure": "Email Failure",
+  "email_failure_message": "Failed to Deliver Email"
 }

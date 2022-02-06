@@ -8,5 +8,7 @@
   "password_size": "پاس ورڈ 8 سے کم اور 128 حروف سے زیادہ نہیں ہو سکتا",
   "password_pattern": "پاس ورڈ میں کم از کم 1 بڑے، 1 چھوٹے اور 1 نمبر کا ہونا ضروری ہے",
   "user_created": "صارف بن گیا ہے",
-  "user_notcreated": "صارف نہیں بنایا جا سکا"
+  "user_notcreated": "صارف نہیں بنایا جا سکا",
+  "email_failure": "Email Failure",
+  "email_failure_message": "Failed to Deliver Email"
   }
