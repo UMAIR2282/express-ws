@@ -3,8 +3,6 @@ const app = require('../../../src/app');
 const User = require('../../../src/domains/users/models/User');
 const sequelize = require('../../../src/config/database');
 const bcrypt = require('bcryptjs');
-//const nodemailerStub = require('nodemailer-stub');
-//const ActivationEmail = require('../../../src/domains/emails/actions/ActivationEmail');
 const SMTPServer = require('smtp-server').SMTPServer;
 
 let lastMailContent, server;
@@ -67,7 +65,6 @@ describe('User Registration', () => {
   const password_size = 'Password cannot be less than 8 and more than 128 characters';
   const password_pattern = 'Password must have at least 1 uppercase, 1 lowercase, and 1 number';
   const email_failure = 'Email Failure';
-  const email_failure_message = 'Failed to Deliver Email';
 
   it('returns 200 OK when signup request is valid', async () => {
     const response = await postUser();
@@ -209,32 +206,20 @@ describe('User Registration', () => {
   });
 
   it('returns 502 Bad Gateway when sending email fails', async () => {
-    /*const mockActivationEmail = jest
-      .spyOn(ActivationEmail, '__invoke')
-      .mockRejectedValue({ message: email_failure_message });*/
     simulateSMTPFailure = true;
     const response = await postUser();
-    //mockActivationEmail.mockRestore();
     expect(response.status).toBe(502);
   });
 
   it(`returns Email failure message ${email_failure} when sending email fails`, async () => {
-    /*const mockActivationEmail = jest
-      .spyOn(ActivationEmail, '__invoke')
-      .mockRejectedValue({ message: email_failure_message });*/
     simulateSMTPFailure = true;
     const response = await postUser();
-    //mockActivationEmail.mockRestore();
     expect(response.body.message).toBe(email_failure);
   });
 
   it(`does not save user to database if activation email fails`, async () => {
-    /*const mockActivationEmail = jest
-      .spyOn(ActivationEmail, '__invoke')
-      .mockRejectedValue({ message: email_failure_message });*/
     simulateSMTPFailure = true;
     await postUser();
-    //mockActivationEmail.mockRestore();
     const userList = await User.findAll();
     expect(userList.length).toBe(0);
   });
@@ -251,7 +236,6 @@ describe('Internationalization', (options = { language: 'ur' }) => {
   const password_size = 'پاس ورڈ 8 سے کم اور 128 حروف سے زیادہ نہیں ہو سکتا';
   const password_pattern = 'پاس ورڈ میں کم از کم 1 بڑے، 1 چھوٹے اور 1 نمبر کا ہونا ضروری ہے';
   const email_failure = 'Email Failure';
-  const email_failure_message = 'Failed to Deliver Email';
 
   it.each`
     field         | value              | expectedMessage
@@ -293,12 +277,8 @@ describe('Internationalization', (options = { language: 'ur' }) => {
   });
 
   it(`returns Email failure message ${email_failure} when sending email fails and language is set as Urdu`, async () => {
-    /*const mockActivationEmail = jest
-      .spyOn(ActivationEmail, '__invoke')
-      .mockRejectedValue({ message: email_failure_message });*/
     simulateSMTPFailure = true;
     const response = await postUser(validUser, options);
-    //mockActivationEmail.mockRestore();
     expect(response.body.message).toBe(email_failure);
   });
 });
