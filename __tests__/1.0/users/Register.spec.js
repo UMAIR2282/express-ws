@@ -3,15 +3,43 @@ const app = require('../../../src/app');
 const User = require('../../../src/domains/users/models/User');
 const sequelize = require('../../../src/config/database');
 const bcrypt = require('bcryptjs');
-const nodemailerStub = require('nodemailer-stub');
-const ActivationEmail = require('../../../src/domains/emails/actions/ActivationEmail');
+//const nodemailerStub = require('nodemailer-stub');
+//const ActivationEmail = require('../../../src/domains/emails/actions/ActivationEmail');
+const SMTPServer = require('smtp-server').SMTPServer;
 
-beforeAll(() => {
-  return sequelize.sync({ force: true });
+let lastMailContent, server;
+let simulateSMTPFailure = false;
+
+beforeAll(async () => {
+  server = new SMTPServer({
+    authOptional: true,
+    onData: (stream, session, callback) => {
+      let mailBody = '';
+      stream.on('data', (data) => {
+        mailBody += data.toString();
+      });
+      stream.on('end', () => {
+        if (simulateSMTPFailure) {
+          const err = new Error('Invalid Mailbox');
+          err.responseCode = 553;
+          return callback(err);
+        }
+        lastMailContent = mailBody;
+        callback();
+      });
+    },
+  });
+  await server.listen(8587, 'localhost');
+  await sequelize.sync({ force: true });
 });
 
 beforeEach(() => {
+  simulateSMTPFailure = false;
   return User.destroy({ truncate: true });
+});
+
+afterAll(async () => {
+  await server.close();
 });
 
 const validUser = {
@@ -175,35 +203,38 @@ describe('User Registration', () => {
     //query user table
     const userList = await User.findAll();
     const savedUser = userList[0];
-    const lastMail = nodemailerStub.interactsWithMail.lastMail();
-    expect(lastMail.to[0]).toBe(validUser.email);
-    expect(lastMail.content).toContain(savedUser.activationToken);
+
+    expect(lastMailContent).toContain(validUser.email);
+    expect(lastMailContent).toContain(savedUser.activationToken);
   });
 
   it('returns 502 Bad Gateway when sending email fails', async () => {
-    const mockActivationEmail = jest
+    /*const mockActivationEmail = jest
       .spyOn(ActivationEmail, '__invoke')
-      .mockRejectedValue({ message: email_failure_message });
+      .mockRejectedValue({ message: email_failure_message });*/
+    simulateSMTPFailure = true;
     const response = await postUser();
-    mockActivationEmail.mockRestore();
+    //mockActivationEmail.mockRestore();
     expect(response.status).toBe(502);
   });
 
   it(`returns Email failure message ${email_failure} when sending email fails`, async () => {
-    const mockActivationEmail = jest
+    /*const mockActivationEmail = jest
       .spyOn(ActivationEmail, '__invoke')
-      .mockRejectedValue({ message: email_failure_message });
+      .mockRejectedValue({ message: email_failure_message });*/
+    simulateSMTPFailure = true;
     const response = await postUser();
-    mockActivationEmail.mockRestore();
+    //mockActivationEmail.mockRestore();
     expect(response.body.message).toBe(email_failure);
   });
 
   it(`does not save user to database if activation email fails`, async () => {
-    const mockActivationEmail = jest
+    /*const mockActivationEmail = jest
       .spyOn(ActivationEmail, '__invoke')
-      .mockRejectedValue({ message: email_failure_message });
+      .mockRejectedValue({ message: email_failure_message });*/
+    simulateSMTPFailure = true;
     await postUser();
-    mockActivationEmail.mockRestore();
+    //mockActivationEmail.mockRestore();
     const userList = await User.findAll();
     expect(userList.length).toBe(0);
   });
@@ -262,11 +293,12 @@ describe('Internationalization', (options = { language: 'ur' }) => {
   });
 
   it(`returns Email failure message ${email_failure} when sending email fails and language is set as Urdu`, async () => {
-    const mockActivationEmail = jest
+    /*const mockActivationEmail = jest
       .spyOn(ActivationEmail, '__invoke')
-      .mockRejectedValue({ message: email_failure_message });
+      .mockRejectedValue({ message: email_failure_message });*/
+    simulateSMTPFailure = true;
     const response = await postUser(validUser, options);
+    //mockActivationEmail.mockRestore();
     expect(response.body.message).toBe(email_failure);
-    mockActivationEmail.mockRestore();
   });
 });
