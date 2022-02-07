@@ -4,5 +4,12 @@
     },
     "apiServer": {
         "port": 3002
+    },
+    "mail": {
+        "host": "localhost",
+        "port": 8587,
+        "tls": {
+            "rejectUnauthorized": false
+        }
     }
 }
