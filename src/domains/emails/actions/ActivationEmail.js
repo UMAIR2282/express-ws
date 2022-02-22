@@ -8,7 +8,7 @@ const __invoke = async (email, activationToken) => {
     subject: 'MyApp Account Activation',
     html: `
       <div><b>Please click below link to activate your account.</b></div>
-      <div><a href="http://localhost8080/#/login?token=${activationToken}">Activate</a></div>
+      <div><a href="http://localhost:8080/#/login?token=${activationToken}">Activate</a></div>
     `,
   });
   if (process.env.NODE_ENV === 'development') {

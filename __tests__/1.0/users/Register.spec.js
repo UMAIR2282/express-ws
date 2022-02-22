@@ -339,7 +339,7 @@ describe('Account Activation', () => {
     ${'ur'}  | ${'correct'} | ${activation_success_ur}
     ${'en'}  | ${'correct'} | ${activation_success_en}
   `(
-    'returns message $expectedMessage when token is wrong when language is set as $language',
+    'returns message $expectedMessage when token is $tokenStatus when language is set as $language',
     async ({ language, tokenStatus, expectedMessage }) => {
       await postUser(validUser, { language: language });
       let token = 'this-token-does-not-exist-in-database';
