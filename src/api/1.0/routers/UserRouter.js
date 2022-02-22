@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const RegisterUser = require('../../../domains/users/actions/Register');
-const ActivateUser = require('../../../domains/users/actions/Activate');
-const FetchUser = require('../../../domains/users/actions/Fetch');
+const UserService = require('../../../domains/users/UserService');
+
 const { check, validationResult } = require('express-validator');
 
 router.post(
@@ -21,7 +20,7 @@ router.post(
     .withMessage('email_invalid')
     .bail()
     .custom(async (email) => {
-      const user = await FetchUser.findByEmail(email);
+      const user = await UserService.findByEmail(email);
       if (user) {
         throw new Error('email_inuse');
       }
@@ -49,7 +48,7 @@ router.post(
         success: false,
       });
     }
-    const response = await RegisterUser.__invoke(req.body);
+    const response = await UserService.register(req.body);
     return res.status(response.status).send({
       message: req.t(response.message),
       error: response.error,
@@ -61,7 +60,7 @@ router.post(
 );
 
 router.post('/api/1.0/users/token/:token', async (req, res) => {
-  const response = await ActivateUser.__invoke(req.params.token);
+  const response = await UserService.activateAccount(req.params.token);
   return res.status(response.status).send({
     message: req.t(response.message),
     error: response.error,

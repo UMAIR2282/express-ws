@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
-const ActivationEmail = require('../../emails/actions/ActivationEmail');
+const EmailService = require('../../emails/EmailService');
 const sequelize = require('../../../config/database');
 const EmailSendingFailure = require('../../emails/exceptions/EmailSendingFailure');
 
@@ -35,7 +35,7 @@ const __invoke = async (body) => {
     };
   }
   try {
-    const emailSentStatus = await ActivationEmail.__invoke(email, user.activationToken);
+    const emailSentStatus = await EmailService.sendActivationEmail(email, user.activationToken);
     await transaction.commit();
     return {
       status: 201,
