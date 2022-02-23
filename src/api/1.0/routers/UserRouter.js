@@ -3,6 +3,7 @@ const router = express.Router();
 const UserService = require('../../../domains/users/UserService');
 
 const { check, validationResult } = require('express-validator');
+const InvalidTokenException = require('../../../domains/users/exceptions/InvalidTokenException');
 
 router.post(
   '/api/1.0/users',
@@ -34,28 +35,33 @@ router.post(
     .bail()
     .isStrongPassword()
     .withMessage('password_pattern'),
-  async (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      const validationErrors = {};
-      errors.array().forEach((error) => {
-        validationErrors[error.param] = req.t(error.msg);
+  async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const validationErrors = {};
+        errors.array().forEach((error) => {
+          validationErrors[error.param] = req.t(error.msg);
+        });
+        return res.status(400).send({
+          message: req.t('user_notcreated'),
+          error: req.t('user_datainvalid'),
+          validationErrors: validationErrors,
+          success: false,
+        });
+      }
+      const response = await UserService.register(req.body);
+      return res.status(response.status).send({
+        message: req.t(response.message),
+        error: response.error,
+        validationErrors: response.validationErrors,
+        user: response.user,
+        success: response.success,
       });
-      return res.status(400).send({
-        message: req.t('user_notcreated'),
-        error: req.t('user_datainvalid'),
-        validationErrors: validationErrors,
-        success: false,
-      });
+    } catch (error) {
+      console.log('UserRouter', error);
+      return next(error);
     }
-    const response = await UserService.register(req.body);
-    return res.status(response.status).send({
-      message: req.t(response.message),
-      error: response.error,
-      validationErrors: response.validationErrors,
-      user: response.user,
-      success: response.success,
-    });
   }
 );
 
@@ -66,6 +72,10 @@ router.post('/api/1.0/users/token/:token', async (req, res) => {
     error: response.error,
     success: response.success,
   });
+});
+
+router.post('/api/1.0/testexception', async (req, res, next) => {
+  next(new InvalidTokenException());
 });
 
 module.exports = router;

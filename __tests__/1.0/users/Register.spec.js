@@ -352,4 +352,10 @@ describe('Account Activation', () => {
       expect(response.body.message).toBe(expectedMessage);
     }
   );
+
+  it('logs exception and returns', async () => {
+    const agent = request(app).post('/api/1.0/testexception');
+    const response = await agent.send();
+    expect(response.status).toBe(404);
+  });
 });
