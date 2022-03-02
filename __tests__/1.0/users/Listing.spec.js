@@ -4,10 +4,11 @@ const User = require('../../../src/domains/users/models/User');
 const sequelize = require('../../../src/config/database');
 beforeAll(async () => {
   await sequelize.sync({ force: true });
+  await User.destroy({ truncate: true });
 });
 
-beforeEach(() => {
-  return User.destroy({ truncate: true });
+beforeEach(async () => {
+  return await User.destroy({ truncate: true });
 });
 
 const getUsers = async (query, options = { language: 'en' }) => {
@@ -84,5 +85,17 @@ describe('Listing Users', () => {
     const user = response.body.content[0];
     expect(user.username).toBe('user11');
     expect(response.body.page).toBe(1);
+  });
+
+  it('returns 1st page when page is set as below zero in request parameter', async () => {
+    await addUsers(11, 0);
+    const response = await getUsers({ page: -5 });
+    expect(response.body.page).toBe(0);
+  });
+
+  it('returns 5 users and corresponding size indicator when size is 5 in request parameter', async () => {
+    await addUsers(11, 0);
+    const response = await getUsers({ size: 5 });
+    expect(response.body.size).toBe(5);
   });
 });

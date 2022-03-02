@@ -16,7 +16,7 @@ const list = async (body) => {
 
 const listAndCount = async (body) => {
   const page = body.page !== undefined && body.page !== null && parseInt(body.page) > 0 ? parseInt(body.page) : 0;
-  const limit = body.limit !== undefined && body.limit !== null && parseInt(body.limit) > 0 ? parseInt(body.limit) : 10;
+  const limit = body.size !== undefined && body.size !== null && parseInt(body.size) > 0 ? parseInt(body.size) : 10;
   const inactive = body.inactive !== undefined && body.inactive !== null && parseInt(body.inactive) > 0 ? parseInt(body.inactive) : 0;
   const userData = await User.findAndCountAll({
     attributes: ['id', 'username', 'email', 'createdAt', 'updatedAt'],
