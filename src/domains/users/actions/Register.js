@@ -16,7 +16,6 @@ const __invoke = async (body) => {
   const { username, email, password } = body;
   const hash = await bcrypt.hash(password, 10);
   const user = { username, email, password: hash, activationToken: generateToken() };
-
   try {
     /*const user = Object.assign({}, body, { password: hash });
             const user = {

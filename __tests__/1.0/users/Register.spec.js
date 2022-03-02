@@ -27,7 +27,9 @@ beforeAll(async () => {
       });
     },
   });
-  await server.listen(8587, 'localhost');
+  await server.listen(8587, '127.0.0.1', () => {
+    console.log('SMTP Server is Running on Port', 8587);
+  });
   await sequelize.sync({ force: true });
 });
 
@@ -74,7 +76,7 @@ describe('User Registration', () => {
   const password_pattern = 'Password must have at least 1 uppercase, 1 lowercase, and 1 number';
   const email_failure = 'Email Failure';
 
-  it('returns 200 OK when signup request is valid', async () => {
+  it('returns 201 Created when signup request is valid', async () => {
     const response = await postUser();
     expect(response.status).toBe(201);
   });
@@ -356,6 +358,6 @@ describe('Account Activation', () => {
   it('logs exception and returns', async () => {
     const agent = request(app).post('/api/1.0/testexception');
     const response = await agent.send();
-    expect(response.status).toBe(404);
+    expect(response.status).toBe(400);
   });
 });

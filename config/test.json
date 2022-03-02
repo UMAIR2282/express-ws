@@ -6,7 +6,7 @@
         "port": 3002
     },
     "mail": {
-        "host": "localhost",
+        "host": "127.0.0.1",
         "port": 8587,
         "tls": {
             "rejectUnauthorized": false

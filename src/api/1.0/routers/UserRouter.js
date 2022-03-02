@@ -59,15 +59,14 @@ router.post(
         success: response.success,
       });
     } catch (error) {
-      console.log('UserRouter', error);
-      return next(error);
+      next(error);
     }
   }
 );
 
 router.post('/api/1.0/users/token/:token', async (req, res) => {
   const response = await UserService.activateAccount(req.params.token);
-  return res.status(response.status).send({
+  res.status(response.status).send({
     message: req.t(response.message),
     error: response.error,
     success: response.success,

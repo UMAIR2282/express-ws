@@ -25,10 +25,9 @@ const app = express();
 app.use(i18nextMiddleware.handle(i18next));
 app.use(express.json());
 app.use(UserRouter);
-app.use((err, req, res) => {
-  console.log('App.js', err);
+app.use((err, req, res, next) => {
   const { status, message, success, validationErrors, error } = err;
-  return res.status(status).send({
+  res.status(status).send({
     message: req.t(message),
     success: success,
     validationErrors: validationErrors,
