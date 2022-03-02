@@ -26,6 +26,15 @@ router.post('/api/1.0/users', UsernameValidator, EmailValidator, PasswordValidat
   }
 });
 
+router.get('/api/1.0/users', async (req, res, next) => {
+  try {
+    const response = await UserService.getUsers({ ...req.body, ...req.query });
+    return res.status(response.status).send(response);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.post('/api/1.0/users/token/:token', async (req, res, next) => {
   try {
     const response = await UserService.activateAccount(req.params.token);

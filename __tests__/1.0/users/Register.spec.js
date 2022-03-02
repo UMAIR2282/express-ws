@@ -40,6 +40,7 @@ beforeEach(() => {
 
 afterAll(async () => {
   await server.close();
+  return User.destroy({ truncate: true });
 });
 
 const validUser = {
@@ -48,20 +49,20 @@ const validUser = {
   password: 'P@ssw0rd',
 };
 
-const postUser = (user = validUser, options = { language: 'en' }) => {
+const postUser = async (user = validUser, options = { language: 'en' }) => {
   const agent = request(app).post('/api/1.0/users');
   if (options.language) {
     agent.set('Accept-Language', options.language);
   }
-  return agent.send(user);
+  return await agent.send(user);
 };
 
-const postUserToken = (token, options = { language: 'en' }) => {
+const postUserToken = async (token, options = { language: 'en' }) => {
   const agent = request(app).post('/api/1.0/users/token/' + token);
   if (options.language) {
     agent.set('Accept-Language', options.language);
   }
-  return agent.send();
+  return await agent.send();
 };
 
 describe('User Registration', () => {
@@ -393,7 +394,6 @@ describe('Error Model', () => {
     let keys = Object.keys(response.body).filter((k) => {
       return ['path', 'timestamp', 'message', 'validationErrors'].findIndex((m) => m === k) >= 0;
     });
-    console.log('response.body', response.body);
     expect(keys).toEqual(['path', 'timestamp', 'message']);
   });
 
