@@ -15,5 +15,6 @@
   "activation_token_invalid": "This account is either already active or the token is invalid",
   "user_activated": "User has been Activated",
   "user_notactivated": "User could not be Activated",
-  "validation_failure": "Validation Failure"
+  "validation_failure": "Validation Failure",
+  "database_error": "Data could not be Saved"
 }

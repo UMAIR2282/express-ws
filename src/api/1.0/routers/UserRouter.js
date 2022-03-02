@@ -45,8 +45,6 @@ router.post(
       const response = await UserService.register(req.body);
       return res.status(response.status).send({
         message: req.t(response.message),
-        error: response.error,
-        validationErrors: response.validationErrors,
         user: response.user,
         success: response.success,
       });
@@ -56,13 +54,17 @@ router.post(
   }
 );
 
-router.post('/api/1.0/users/token/:token', async (req, res) => {
-  const response = await UserService.activateAccount(req.params.token);
-  res.status(response.status).send({
-    message: req.t(response.message),
-    error: response.error,
-    success: response.success,
-  });
+router.post('/api/1.0/users/token/:token', async (req, res, next) => {
+  try {
+    const response = await UserService.activateAccount(req.params.token);
+    return res.status(response.status).send({
+      message: req.t(response.message),
+      user: response.user,
+      success: response.success,
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.post('/api/1.0/testexception', async (req, res, next) => {

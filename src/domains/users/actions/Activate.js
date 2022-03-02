@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const InvalidTokenException = require('../exceptions/InvalidTokenException');
+const DatabaseException = require('../../common/exceptions/DatabaseException');
 
 const __invoke = async (token) => {
   let user;
@@ -8,23 +9,12 @@ const __invoke = async (token) => {
     user.inactive = false;
     user.activationToken = null;
   } catch (error) {
-    const exception = new InvalidTokenException();
-    return {
-      status: exception.status,
-      message: exception.message,
-      success: exception.success,
-      error: error,
-    };
+    throw new InvalidTokenException(error);
   }
   try {
     await user.save();
   } catch (error) {
-    return {
-      status: 404,
-      message: 'user_notactivated',
-      error: error,
-      success: false,
-    };
+    throw new DatabaseException(error);
   }
   return {
     status: 200,

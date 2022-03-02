@@ -3,5 +3,4 @@ module.exports = function EmailSendingFailure(error = null) {
   this.status = 502;
   this.success = false;
   this.error = error;
-  this.validationErrors = { email: 'email_failure' };
 };

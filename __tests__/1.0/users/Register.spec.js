@@ -386,4 +386,29 @@ describe('Error Model', () => {
     });
     expect(keys).toEqual(['path', 'timestamp', 'message', 'validationErrors']);
   });
+
+  it(`returns path, timestamp, and message in response when request fails other than validation`, async () => {
+    const token = 'this-token-does-not-exist-in-database';
+    const response = await postUserToken(token);
+    let keys = Object.keys(response.body).filter((k) => {
+      return ['path', 'timestamp', 'message', 'validationErrors'].findIndex((m) => m === k) >= 0;
+    });
+    console.log('response.body', response.body);
+    expect(keys).toEqual(['path', 'timestamp', 'message']);
+  });
+
+  it(`returns path in error body`, async () => {
+    const token = 'this-token-does-not-exist-in-database';
+    const response = await postUserToken(token);
+    expect(response.body.path).toEqual('/api/1.0/users/token/' + token);
+  });
+
+  it(`returns timestamp in milliseconds within 5 seconds value in error body`, async () => {
+    const token = 'this-token-does-not-exist-in-database';
+    const nowInMillis = new Date().getTime();
+    const fiveSecondsLater = nowInMillis + 5000;
+    const response = await postUserToken(token);
+    expect(response.body.timestamp).toBeGreaterThan(nowInMillis);
+    expect(response.body.timestamp).toBeLessThan(fiveSecondsLater);
+  });
 });
