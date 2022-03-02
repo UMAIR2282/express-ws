@@ -3,6 +3,7 @@ const i18next = require('i18next');
 const UserRouter = require('./api/1.0/routers/UserRouter');
 const i18nextBackend = require('i18next-fs-backend');
 const i18nextMiddleware = require('i18next-http-middleware');
+const ErrorHandler = require('./domains/common/exceptions/ErrorHandler');
 
 i18next
   .use(i18nextBackend)
@@ -25,24 +26,6 @@ const app = express();
 app.use(i18nextMiddleware.handle(i18next));
 app.use(express.json());
 app.use(UserRouter);
-app.use((err, req, res, next) => {
-  let { status, message, success, validationErrors, validationErrorsArray, error } = err;
-
-  if (validationErrorsArray) {
-    if (!validationErrors) {
-      validationErrors = {};
-    }
-    validationErrorsArray.forEach((error) => {
-      validationErrors[error.param] = req.t(error.msg);
-    });
-  }
-
-  res.status(status).send({
-    message: req.t(message),
-    success: success,
-    validationErrors: validationErrors,
-    error: error,
-  });
-});
+app.use(ErrorHandler);
 
 module.exports = app;
