@@ -26,7 +26,17 @@ app.use(i18nextMiddleware.handle(i18next));
 app.use(express.json());
 app.use(UserRouter);
 app.use((err, req, res, next) => {
-  const { status, message, success, validationErrors, error } = err;
+  let { status, message, success, validationErrors, validationErrorsArray, error } = err;
+
+  if (validationErrorsArray) {
+    if (!validationErrors) {
+      validationErrors = {};
+    }
+    validationErrorsArray.forEach((error) => {
+      validationErrors[error.param] = req.t(error.msg);
+    });
+  }
+
   res.status(status).send({
     message: req.t(message),
     success: success,

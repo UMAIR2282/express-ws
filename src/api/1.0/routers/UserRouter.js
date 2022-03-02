@@ -4,6 +4,7 @@ const UserService = require('../../../domains/users/UserService');
 
 const { check, validationResult } = require('express-validator');
 const InvalidTokenException = require('../../../domains/users/exceptions/InvalidTokenException');
+const ValidationException = require('../../../domains/common/exceptions/ValidationException');
 
 router.post(
   '/api/1.0/users',
@@ -39,16 +40,7 @@ router.post(
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        const validationErrors = {};
-        errors.array().forEach((error) => {
-          validationErrors[error.param] = req.t(error.msg);
-        });
-        return res.status(400).send({
-          message: req.t('user_notcreated'),
-          error: req.t('user_datainvalid'),
-          validationErrors: validationErrors,
-          success: false,
-        });
+        return next(new ValidationException(req.t('user_datainvalid'), errors.array()));
       }
       const response = await UserService.register(req.body);
       return res.status(response.status).send({
