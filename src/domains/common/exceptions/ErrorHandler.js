@@ -12,6 +12,8 @@ module.exports = (err, req, res, next) => {
   }
 
   res.status(status).send({
+    path: '',
+    timestamp: '',
     message: req.t(message),
     success: success,
     validationErrors: validationErrors,

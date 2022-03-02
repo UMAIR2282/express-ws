@@ -14,5 +14,6 @@
   "email_failure_message": "Failed to Deliver Email",
   "activation_token_invalid": "This account is either already active or the token is invalid",
   "user_activated": "User has been Activated",
-  "user_notactivated": "User could not be Activated"
+  "user_notactivated": "User could not be Activated",
+  "validation_failure": "Validation Failure"
 }

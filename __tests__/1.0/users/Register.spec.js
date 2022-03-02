@@ -75,6 +75,7 @@ describe('User Registration', () => {
   const password_size = 'Password cannot be less than 8 and more than 128 characters';
   const password_pattern = 'Password must have at least 1 uppercase, 1 lowercase, and 1 number';
   const email_failure = 'Email Failure';
+  const validation_failure = 'Validation Failure';
 
   it('returns 201 Created when signup request is valid', async () => {
     const response = await postUser();
@@ -233,6 +234,13 @@ describe('User Registration', () => {
     const userList = await User.findAll();
     expect(userList.length).toBe(0);
   });
+
+  it(`returns ${validation_failure} message in error response body when validation fails`, async () => {
+    const user = { ...validUser };
+    user['username'] = null;
+    const response = await postUser(user);
+    expect(response.body.message).toBe(validation_failure);
+  });
 });
 
 describe('Internationalization', (options = { language: 'ur' }) => {
@@ -246,6 +254,7 @@ describe('Internationalization', (options = { language: 'ur' }) => {
   const password_size = 'پاس ورڈ 8 سے کم اور 128 حروف سے زیادہ نہیں ہو سکتا';
   const password_pattern = 'پاس ورڈ میں کم از کم 1 بڑے، 1 چھوٹے اور 1 نمبر کا ہونا ضروری ہے';
   const email_failure = 'Email Failure';
+  const validation_failure = 'Validation Failure';
 
   it.each`
     field         | value              | expectedMessage
@@ -290,6 +299,13 @@ describe('Internationalization', (options = { language: 'ur' }) => {
     simulateSMTPFailure = true;
     const response = await postUser(validUser, options);
     expect(response.body.message).toBe(email_failure);
+  });
+
+  it(`returns ${validation_failure} message in error response body when validation fails and language is set as Urdu`, async () => {
+    const user = { ...validUser };
+    user['username'] = null;
+    const response = await postUser(user, options);
+    expect(response.body.message).toBe(validation_failure);
   });
 });
 
@@ -359,5 +375,15 @@ describe('Account Activation', () => {
     const agent = request(app).post('/api/1.0/testexception');
     const response = await agent.send();
     expect(response.status).toBe(400);
+  });
+});
+
+describe('Error Model', () => {
+  it(`returns path, timestamp, message, and validationErrors in response when validation fails`, async () => {
+    const response = await postUser({ ...validUser, username: null });
+    let keys = Object.keys(response.body).filter((k) => {
+      return ['path', 'timestamp', 'message', 'validationErrors'].findIndex((m) => m === k) >= 0;
+    });
+    expect(keys).toEqual(['path', 'timestamp', 'message', 'validationErrors']);
   });
 });
