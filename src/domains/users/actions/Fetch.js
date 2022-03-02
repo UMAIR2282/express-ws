@@ -5,7 +5,10 @@ const byEmail = async (email) => {
 };
 
 const list = async (body) => {
-  const limit = body.limit ? body.limit : 10;
+  const limit =
+    body.size !== undefined && body.size !== null && parseInt(body.size) > 0 && parseInt(body.size) < 1000
+      ? parseInt(body.size)
+      : 10;
   const inactive = body.inactive !== undefined && body.inactive !== null ? body.inactive : 0;
   return await User.findAll({
     attributes: ['id', 'username', 'email', 'createdAt', 'updatedAt'],
@@ -16,8 +19,12 @@ const list = async (body) => {
 
 const listAndCount = async (body) => {
   const page = body.page !== undefined && body.page !== null && parseInt(body.page) > 0 ? parseInt(body.page) : 0;
-  const limit = body.size !== undefined && body.size !== null && parseInt(body.size) > 0 ? parseInt(body.size) : 10;
-  const inactive = body.inactive !== undefined && body.inactive !== null && parseInt(body.inactive) > 0 ? parseInt(body.inactive) : 0;
+  const limit =
+    body.size !== undefined && body.size !== null && parseInt(body.size) > 0 && parseInt(body.size) < 1000
+      ? parseInt(body.size)
+      : 10;
+  const inactive =
+    body.inactive !== undefined && body.inactive !== null && parseInt(body.inactive) > 0 ? parseInt(body.inactive) : 0;
   const userData = await User.findAndCountAll({
     attributes: ['id', 'username', 'email', 'createdAt', 'updatedAt'],
     where: { inactive: inactive },
@@ -29,7 +36,10 @@ const listAndCount = async (body) => {
 
 const countData = async (body) => {
   const page = body.page !== undefined && body.page !== null ? body.page : 0;
-  const limit = body.limit ? body.limit : 10;
+  const limit =
+    body.size !== undefined && body.size !== null && parseInt(body.size) > 0 && parseInt(body.size) < 1000
+      ? parseInt(body.size)
+      : 10;
   const inactive = body.inactive !== undefined && body.inactive !== null ? body.inactive : 0;
   const count = await User.count({
     where: { inactive: inactive },

@@ -98,4 +98,10 @@ describe('Listing Users', () => {
     const response = await getUsers({ size: 5 });
     expect(response.body.size).toBe(5);
   });
+
+  it('returns 10 users and corresponding size indicator when size is 1000 in request parameter', async () => {
+    await addUsers(11, 0);
+    const response = await getUsers({ size: 1000 });
+    expect(response.body.size).toBe(10);
+  });
 });
